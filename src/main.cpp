@@ -1,7 +1,7 @@
 #include <iostream>
 // #include "CustomVector.h"
-// #include "Property.h"
-#include "dataCleaning.h"
+#include "Property.h"
+// #include "dataCleaning.h"
 
 using namespace std;
 
@@ -58,14 +58,21 @@ int main(){
     PropertyContainer container;
     container.importFile(".././dataset/mudah-apartment-kl-selangor.csv");
     
-    container.setProperties(clean::forwardFillEmpty(container.getProperties()));
-    for(Property prop : container.getProperties()){
+    container.forwardFillEmpty();
+    cout<<"printing supposedly invalid elements"<<endl;
+    for(Property prop : container.properties){
         if(prop.prop_name.find("@") != string::npos || prop.prop_name.find("–") != string::npos || prop.prop_name.find('"') != string::npos || prop.prop_name == "0" || prop.monthly_rent < 100 || prop.room < 1){
+            cout<<prop.toCSVFormat()<<endl;
+        }
+        if(prop.prop_name.find("Pavilion") != string::npos){
             cout<<prop.toCSVFormat()<<endl;
         }
     }
     cout<<"all supposedly invalid elements printed"<<endl;
-    container.writeToFile(".././dataset/cleaned_prop_data.csv");
+    // clean::forwardFillEmpty(container.properties);
+
+    // cout << Property::objectCount << " property remaining after cleaning" << endl;
+    // container.writeToFile(".././dataset/cleaned_prop_data.csv");
     cout << Property::objectCount << " property remaining before scope end" << endl;
     cout << " program ended" << endl;
     return 0;

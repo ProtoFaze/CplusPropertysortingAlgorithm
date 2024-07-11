@@ -11,6 +11,7 @@ using namespace std;
 class Property {
 public:
     static int objectCount;
+
     int ads_id;                   // Unique listing id
     string prop_name;             // Name of the property
     double monthly_rent;          // Monthly rent in RM
@@ -20,7 +21,7 @@ public:
     Property(int id, const string& name, double rent, int rms)
         : ads_id(id), prop_name(name), monthly_rent(rent),room(rms) {
             objectCount++;
-          }
+        }
 
     // Display property details
     void display() const {

@@ -14,20 +14,39 @@ public:
     static int objectCount;
 
     int ads_id;                   // Unique listing id
-    string prop_name;             // Name of the property
-    double monthly_rent;          // Monthly rent in RM
-    int room;                     // Number of rooms in the unit
+    string prop_name="0";             // Name of the property
+    double monthly_rent=0;          // Monthly rent in RM
+    int room=0;                     // Number of rooms in the unit
 
     // Constructor to initialize property
     Property(): ads_id(0), prop_name("0"), monthly_rent(0),room(0) {
             objectCount++;
-        }
+    }
 
     Property(int id, const string& name, double rent, int rms)
         : ads_id(id), prop_name(name), monthly_rent(rent),room(rms) {
             objectCount++;
-        }
+    }
+    Property(const Property& new_prop) : ads_id(new_prop.ads_id), prop_name(new_prop.prop_name), monthly_rent(new_prop.monthly_rent), room(new_prop.room){
+        cout<<"copy constructor called"<<endl;
+    }
 
+    Property& operator=(const Property& newProp){
+        ads_id = newProp.ads_id;
+        prop_name = newProp.prop_name;
+        monthly_rent = newProp.monthly_rent;
+        room = newProp.room;
+        cout<<"copy assignment operator called"<<endl;
+        return *this;
+    }
+    Property& operator=(Property&& newProp){
+        ads_id = newProp.ads_id;
+        prop_name = newProp.prop_name;
+        monthly_rent = newProp.monthly_rent;
+        room = newProp.room;
+        cout<<"move assignment operator called"<<endl;
+        return *this;
+    }
     // Display property details
     void display() const {
         cout << "-------------------------" << endl;
@@ -49,38 +68,36 @@ public:
 };
 
 class PropertyContainer{
-private:
-    Vlist<Property> properties;  // CustomVector to store properties
 
 public:    
+    Vlist<Property> properties;  // CustomVector to store properties
 
-    Vlist<Property> getProperties() const {
+    //TODO: fix the function to prevent property member destruction after function end
+    Vlist<Property>& getProperties() {
         return properties;  
     }
     void setProperties(Vlist<Property> props) {
+        cout<<"clearing properties"<<endl;
         properties.clear();
-        if(properties.get_size() > 0){
+        if(properties.getSize() > 0){
             cout<<"data still exist, aborting"<<endl;
             return;
         }else{
             cout<<"data has been cleared, setting properties"<<endl;
-            for(Property prop: props){
-                properties.push_back(prop);
+            for(size_t i ; i< props.getSize(); i++){
+                properties[i] = std::move(props[i]);
             }
+            cout<<"properties has been set"<<endl;
         }
-        // for(Property prop: props){
-        //     properties.push_back(prop);
-        // }
-
     }
     
     // Insert new property
     void insertProperty(const Property& prop) {
-        properties.push_back(prop);
+        properties.emplaceBack(prop);
     }
 
     void deleteProperty(int ads_id) {
-        for(size_t i = 0; i < properties.get_size(); ++i) {
+        for(size_t i = 0; i < properties.getSize(); ++i) {
             if (properties[i].ads_id == ads_id) {
                 properties.erase(i);
                 return;
@@ -133,19 +150,27 @@ public:
                             break;
                         }
                     }
-                    tokens.push_back(temp);
+                    tokens.pushBack(temp);
                 } else if(token.empty()){
-                    tokens.push_back("0");
+                    tokens.pushBack("0");
                 } else{
-                    tokens.push_back(token);
+                    tokens.pushBack(token);
                 }
             }
-            if (tokens.get_size() >= 11) { // Check if the line has enough tokens
+            if (tokens.getSize() >= 11) { // Check if the line has enough tokens
                 int ads_id = stoi(tokens[0]);
                 string prop_name = tokens[1];
                 double monthly_rent;
                 if(tokens[3]!="0"){
-                    monthly_rent = stod(tokens[3].substr(3)); 
+                    tokens[3].erase(0, 3);// Remove RM prefix
+                    int invalid_char_pos = tokens[3].find(" per month"); //remove per month suffix
+                    tokens[3].replace(invalid_char_pos, 10, "");
+                    //Remove thousanth spacer
+                    int thousand_separator = tokens[3].find(" ");
+                    if(thousand_separator != string::npos){
+                        tokens[3].replace(thousand_separator, 1, "");
+                    }
+                    monthly_rent = stod(tokens[3]); 
                 }
                 if(tokens[6] == "More than 10"){
                     tokens[6] = "11";
@@ -153,7 +178,7 @@ public:
                 int rooms = stoi(tokens[6]);
 
                 // Property object and add to vector
-                properties.emplace_back(ads_id, prop_name, monthly_rent, rooms);
+                properties.emplaceBack(ads_id, prop_name, monthly_rent, rooms);
          } else {
             cerr << "Skipping line due to Insufficient data" << endl;
         }
@@ -161,6 +186,47 @@ public:
 
         file.close();
     }
+
+    string replaceInvalidChar(string str){
+        if (str.find("–")!= string::npos){ 
+            //replace the character with a hyphen
+            int invalid_char_pos = str.find("–");
+            str.replace(invalid_char_pos, 3, "-");
+        }
+        if (str.find("@")!= string::npos){ 
+            //replace the character with @ symbol
+            int at_symbol_pos = str.find("@");
+            str.replace(at_symbol_pos, 1, "-");
+        }
+        if (str.find('"')!= string::npos){ 
+            //trim the quotation marks
+            str = str.substr(1, str.size()-2);
+        }
+        return str;
+    }
+
+    void forwardFillEmpty() {
+        string last_prop_name = replaceInvalidChar(properties[0].prop_name);
+        int last_room = properties[0].room;
+        double last_rent = properties[0].monthly_rent;
+        for (size_t i = 0; i < properties.getSize(); ++i) {
+            if (properties[i].ads_id == 0) {
+                properties[i].ads_id = properties[i - 1].ads_id;
+            }if (properties[i].prop_name !="0") {
+                last_prop_name = replaceInvalidChar(properties[i].prop_name);
+            }
+            properties[i].prop_name = last_prop_name;
+            if (properties[i].monthly_rent >= 100) {
+                last_rent = properties[i].monthly_rent;
+            }
+            properties[i].monthly_rent = last_rent;
+            if (properties[i].room < 1) {
+                properties[i].room = last_room;
+            }
+            last_room = properties[i].room;
+        }
+    }
+
     void writeToFile(const string& filePath){
         //open the file and write 
         ofstream file(filePath); // Open file
@@ -175,5 +241,6 @@ public:
         }
         file.close();
     }
+    
 };
 #endif

@@ -10,16 +10,18 @@ class Vlist {
         size_t size = 0;
 
     void resize(size_t new_capacity) {
-        T* new_data = new T[new_capacity];
+        T* new_data = (T*) ::operator new(new_capacity * sizeof(T));
         
         if (new_capacity < size) {
             size = new_capacity;
         }
         for (size_t i = 0; i < size; i++) {
-            new_data[i] = std::move(data[i]);
+            new(&new_data[i]) T(std::move(data[i]));
         }
-        
-        delete[] data;
+        for (size_t i = 0; i < size; i++) {
+            data[i].~T();
+        }        
+        ::operator delete(data, capacity * sizeof(T));
         data = new_data;
         capacity = new_capacity;
     }
@@ -36,11 +38,12 @@ class Vlist {
         }
 
         ~Vlist() {
-            delete[] data;
+            clear();
+            ::operator delete(data, capacity * sizeof(T));
             std::cout << "Vlist object destroyed" << std::endl;
         }
 
-        void push_back(const T& value) {
+        void pushBack(const T& value) {
             if (size >= capacity) {
                 resize(capacity == 0 ? 1 : capacity * 2);
             }
@@ -48,7 +51,7 @@ class Vlist {
             size++;
         }
 
-        void push_back(T&& value) {
+        void pushBack(T&& value) {
             if (size >= capacity) {
                 resize(capacity == 0 ? 1 : capacity * 2);
             }
@@ -57,7 +60,7 @@ class Vlist {
         }
 
         template<typename... Args>
-        T& emplace_back(Args&&... args) {
+        T& emplaceBack(Args&&... args) {
             if (size >= capacity) {
                 resize(capacity == 0 ? 1 : capacity * 2);
             }
@@ -65,7 +68,7 @@ class Vlist {
             return data[size++];
         }
 
-        void pop_back() {
+        void popBack() {
             if (size > 0) {
                 size--;
                 data[size].~T();
@@ -75,10 +78,8 @@ class Vlist {
         }
 
         void clear() {
-            if (data) {
-                for (size_t i = 0; i < size; ++i) {
-                    data[i].~T();
-                }
+            for (size_t i = 0; i < size; i++) {
+                data[i].~T();
             }
             size = 0;
         }
@@ -97,11 +98,11 @@ class Vlist {
             return data[index];
         }
 
-        size_t get_size() const {
+        size_t getSize() const {
             return size;
         }
 
-        size_t get_capacity() const {
+        size_t getCapacity() const {
             return capacity;
         }
 
