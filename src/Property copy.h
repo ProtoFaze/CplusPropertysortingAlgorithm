@@ -1,7 +1,4 @@
-# include <string>
-
-using namespace std;
-
+//original implementation of property
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -13,47 +10,59 @@ using namespace std;
 // Class representing a property with various attributes
 class Property {
 public:
+    static int objectCount;
     int ads_id;                   // Unique listing id
     string prop_name;             // Name of the property
-    int completion_year;          // Completion year of the property
     double monthly_rent;          // Monthly rent in RM
-    string location;              // Property location in Kuala Lumpur region
-    string property_type;         // Property type such as apartment, condominium, flat, duplex, studio etc
     int room;                     // Number of rooms in the unit
-    int parking;                  // Number of parking space for the unit
-    int bathroom;                 // Number of bathrooms in the unit
-    double size;                  // Total area of the unit in square feet
-    string furnished;             // Furnishing status of the unit (fully, partial, non-furnished)
 
     // Constructor to initialize property
-    Property(int id, const string& name, int year, double rent, const string& loc,
-             const string& type, int rms, int prk, int bath, double sz, const string& frn)
-        : ads_id(id), prop_name(name), completion_year(year), monthly_rent(rent), location(loc),
-          property_type(type), room(rms), parking(prk), bathroom(bath), size(sz), furnished(frn) {}
+    Property(int id, const string& name, double rent, int rms)
+        : ads_id(id), prop_name(name), monthly_rent(rent),room(rms) {
+            objectCount++;
+          }
 
     // Display property details
     void display() const {
         cout << "-------------------------" << endl;
         cout << "Property ID: " << ads_id << endl;
         cout << "Name: " << prop_name << endl;
-        cout << "Year of Completion: " << completion_year << endl;
         cout << "Monthly Rent: " << monthly_rent << endl;
-        cout << "Location: " << location << endl;
-        cout << "Property Type: " << property_type << endl;
         cout << "Rooms: " << room << endl;
-        cout << "Parking Spaces: " << parking << endl;
-        cout << "Bathrooms: " << bathroom << endl;
-        cout << "Size: " << size << endl;
-        cout << "Furnishing status: " << furnished << endl;
         cout << "-------------------------" << endl;
+    }
+
+    string toCSVFormat() const {
+        stringstream ss;
+        ss << ads_id << "," << prop_name << "," << monthly_rent << "," << room;
+        return ss.str();
+    }
+    ~Property(){
+        objectCount--;
     }
 };
 
-class PropertyContainer {
+class PropertyContainer{
 private:
     vector<Property> properties;  // CustomVector to store properties
 
 public:
+    vector<Property> getProperties() const {
+        return properties;
+    }
+    void setProperties(vector<Property> props) {
+        properties.clear();
+        if(properties.size()>0){
+            cout<<"data still exist, aborting"<<endl;
+            return;
+        }else{
+            cout<<"data has been cleared, setting properties"<<endl;
+            for(Property prop: props){
+                properties.push_back(prop);
+            }
+        }
+
+    }
     // Insert new property
     void insertProperty(const Property& prop) {
         properties.push_back(prop);
@@ -87,7 +96,7 @@ public:
         }
     }
 
-void importFile(const string& filename) {
+    void importFile(const string& filename) {
         ifstream file(filename); // Open file
         if (!file.is_open()) { // Check if the file opening is successful
             cerr << "Error opening file: " << filename << endl;
@@ -108,7 +117,7 @@ void importFile(const string& filename) {
                     string temp;
                     temp += token;
                     while (getline(ss, token, ',')) {
-                        temp += token;
+                        temp += " -" + token;
                         if (token.back() == '"') {
                             break;
                         }
@@ -120,33 +129,49 @@ void importFile(const string& filename) {
                     tokens.push_back(token);
                 }
             }
-
             if (tokens.size() >= 11) { // Check if the line has enough tokens
                 int ads_id = stoi(tokens[0]);
                 string prop_name = tokens[1];
-                int completion_year = stoi(tokens[2]);
-                double monthly_rent = stod(tokens[3].substr(3)); 
-                string location = tokens[4];
-                string property_type = tokens[5];
-                std::cout << "rooms: " << tokens[6] << "id" << tokens[0] << std::endl;
+                double monthly_rent;
+                if(tokens[3]!="0"){
+                    tokens[3].erase(0, 3);// Remove RM prefix
+                    int invalid_char_pos = tokens[3].find(" per month"); //remove per month suffix
+                    tokens[3].replace(invalid_char_pos, 10, "");
+                    //Remove thousanth spacer
+                    int thousand_separator = tokens[3].find(" ");
+                    if(thousand_separator != string::npos){
+                        tokens[3].replace(thousand_separator, 1, "");
+                    }
+                    monthly_rent = stod(tokens[3]); 
+                }
                 if(tokens[6] == "More than 10"){
                     tokens[6] = "11";
                 }
                 int rooms = stoi(tokens[6]);
-                int parking = stoi(tokens[7]);
-                int bathroom = stoi(tokens[8]);
-                double size = stod(tokens[9].substr(0, tokens[9].find(" sq.ft.")));
-                string furnished_status = tokens[10];
 
                 // Property object and add to vector
-                Property property(ads_id, prop_name, completion_year, monthly_rent, location,
-                              property_type, rooms, parking, bathroom, size, furnished_status);
+                Property property(ads_id, prop_name, monthly_rent, rooms);
                 properties.push_back(property);
          } else {
             cerr << "Skipping line due to Insufficient data" << endl;
         }
     }
 
+        file.close();
+    }
+
+    void writeToFile(const string& filePath){
+        //open the file and write 
+        ofstream file(filePath); // Open file
+        if (!file.is_open()) { // Check if the file opening is successful
+            cerr << "Error opening file: " << filePath << endl;
+            return;
+        }else{
+            cout<<"writing to file"<<endl;
+        }
+        for(Property prop: properties){
+            file<<prop.toCSVFormat()<<endl;
+        }
         file.close();
     }
 };

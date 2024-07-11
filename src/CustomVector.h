@@ -2,30 +2,32 @@
 #include <stdexcept>
 #include <string>
 #include <initializer_list>
-
 template<typename T>
 class Vlist {
     private:
-        T* data;
-        size_t capacity;
-        size_t size;
+        T* data = nullptr;
+        size_t capacity = 0;
+        size_t size = 0;
 
     void resize(size_t new_capacity) {
-        T* new_data = static_cast<T*>(::operator new(new_capacity * sizeof(T)));
+        T* new_data = new T[new_capacity];
         
-        // Construct new elements
-        for (size_t i = 0; i < size; ++i) {
-            new(new_data + i) T(std::move(data[i]));
-            data[i].~T(); // Manually destroy old element
+        if (new_capacity < size) {
+            size = new_capacity;
+        }
+        for (size_t i = 0; i < size; i++) {
+            new_data[i] = std::move(data[i]);
         }
         
-        ::operator delete(data);
+        delete[] data;
         data = new_data;
         capacity = new_capacity;
     }
 
     public:
-        Vlist() : data(nullptr), capacity(0), size(0) {}
+        Vlist(){
+            resize(2);
+        }
 
         Vlist(size_t initial_capacity) : data(new T[initial_capacity]), capacity(initial_capacity), size(0) {}
 
@@ -34,46 +36,51 @@ class Vlist {
         }
 
         ~Vlist() {
-            if (data) {
-                for (size_t i = 0; i < size; ++i) {
-                    data[i].~T();
-                }
-                ::operator delete(data);
-            }
+            delete[] data;
+            std::cout << "Vlist object destroyed" << std::endl;
         }
 
         void push_back(const T& value) {
             if (size >= capacity) {
                 resize(capacity == 0 ? 1 : capacity * 2);
             }
-            data[size++] = value;
+            data[size] = value;
+            size++;
         }
 
         void push_back(T&& value) {
             if (size >= capacity) {
                 resize(capacity == 0 ? 1 : capacity * 2);
             }
-            data[size++] = std::move(value);
+            data[size] = std::move(value);
+            size++;
+        }
+
+        template<typename... Args>
+        T& emplace_back(Args&&... args) {
+            if (size >= capacity) {
+                resize(capacity == 0 ? 1 : capacity * 2);
+            }
+            new(&data[size]) T(std::forward<Args>(args)...);
+            return data[size++];
         }
 
         void pop_back() {
             if (size > 0) {
-                --size;
+                size--;
+                data[size].~T();
             } else {
                 throw std::out_of_range("Vector is empty");
             }
         }
 
-        size_t get_size() const {
-            return size;
-        }
-
-        size_t get_capacity() const {
-            return capacity;
-        }
-
-        bool is_empty() const {
-            return size == 0;
+        void clear() {
+            if (data) {
+                for (size_t i = 0; i < size; ++i) {
+                    data[i].~T();
+                }
+            }
+            size = 0;
         }
 
         T& operator[](size_t index) {
@@ -90,11 +97,16 @@ class Vlist {
             return data[index];
         }
 
-        void clear() {
-            delete[] data;
-            data = nullptr;
-            capacity = 0;
-            size = 0;
+        size_t get_size() const {
+            return size;
+        }
+
+        size_t get_capacity() const {
+            return capacity;
+        }
+
+        bool is_empty() const {
+            return size == 0;
         }
 
         T* begin() {
@@ -136,5 +148,5 @@ class Vlist {
             }
             --size;
         }
-
+        
 };
