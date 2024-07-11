@@ -51,10 +51,10 @@ namespace clean{
     // }
 
     vector<Property> forwardFillEmpty(vector<Property> properties) {
-        string last_prop_name = properties[0].prop_name;
+        string last_prop_name = replaceInvalidChar(properties[0].prop_name);
         int last_room = properties[0].room;
         double last_rent = properties[0].monthly_rent;
-        for (size_t i = 1; i < properties.size(); ++i) {
+        for (size_t i = 0; i < properties.size(); ++i) {
             if (properties[i].ads_id == 0) {
                 properties[i].ads_id = properties[i - 1].ads_id;
             }if (properties[i].prop_name !="0") {
@@ -65,10 +65,20 @@ namespace clean{
                 last_rent = properties[i].monthly_rent;
             }
             properties[i].monthly_rent = last_rent;
-            if (properties[i].room >= 0) {
-                last_room = properties[i].room;
+            if (properties[i].room < 1) {
+                properties[i].room = last_room;
             }
-            properties[i].room = last_room;
+            last_room = properties[i].room;
+        }
+        return properties;
+    }
+
+    vector<Property> dropInvalid(vector<Property> properties){
+        vector<Property> new_properties;
+        for(Property prop : properties){
+            if(prop.monthly_rent > 100 & prop.room > 0 & prop.prop_name == "0" & prop.ads_id == 0){
+                new_properties.push_back(prop);
+            }
         }
         return properties;
     }

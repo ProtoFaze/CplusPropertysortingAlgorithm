@@ -4,6 +4,7 @@
 #include "dataCleaning.h"
 
 using namespace std;
+
 int Property::objectCount = 0;  // Definition of the static member
 struct coords{
     float x = 0.0f, y = 0.0f, z = 0.0f;
@@ -57,10 +58,9 @@ int main(){
     PropertyContainer container;
     container.importFile(".././dataset/mudah-apartment-kl-selangor.csv");
     
-    // container.setProperties(clean::forwardFillEmpty(container.getProperties()));
-    vector<Property> clean = clean::forwardFillEmpty(container.getProperties());
-    for(Property prop : clean){
-        if(prop.monthly_rent < 100 || prop.room < 0 || prop.prop_name == "0" || prop.ads_id == 0){
+    container.setProperties(clean::forwardFillEmpty(container.getProperties()));
+    for(Property prop : container.getProperties()){
+        if(prop.prop_name.find("@") != string::npos || prop.prop_name.find("–") != string::npos || prop.prop_name.find('"') != string::npos || prop.prop_name == "0" || prop.monthly_rent < 100 || prop.room < 1){
             cout<<prop.toCSVFormat()<<endl;
         }
     }
@@ -68,25 +68,5 @@ int main(){
     container.writeToFile(".././dataset/cleaned_prop_data.csv");
     cout << Property::objectCount << " property remaining before scope end" << endl;
     cout << " program ended" << endl;
-    // Vlist<coords> list;
-    // list.emplace_back(1.0f);
-    //     PrintList(list);
-    // list.emplace_back(1, 5, 9);
-    //     PrintList(list);
-    // list.emplace_back(1, 9, 7);
-    //     PrintList(list);
-    // list.emplace_back();
-    // PrintList(list);
-    // list.pop_back();
-    // list.pop_back();
-    // PrintList(list);
-    // list.emplace_back(7, 3, 8);
-    // list.emplace_back();
-    // PrintList(list);
-    // list.clear();
-    // PrintList(list);
-    // list.emplace_back(1, 5, 9);
-    // list.emplace_back(1, 9, 7);
-    // PrintList(list);
     return 0;
 }
