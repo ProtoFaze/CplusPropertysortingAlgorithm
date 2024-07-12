@@ -1,7 +1,7 @@
 #include <iostream>
 // #include "CustomVector.h"
-#include "Property.h"
-// #include "dataCleaning.h"
+// #include "Property.h"
+#include "dataCleaning.h"
 
 using namespace std;
 
@@ -58,9 +58,10 @@ int main(){
     PropertyContainer container;
     container.importFile(".././dataset/mudah-apartment-kl-selangor.csv");
     
-    container.forwardFillEmpty();
+    shared_ptr<Vlist<Property>> props = container.getProperties();
+    clean::forwardFillEmpty(props.get());
     cout<<"printing supposedly invalid elements"<<endl;
-    for(Property prop : container.properties){
+    for(Property prop : *props){
         if(prop.prop_name.find("@") != string::npos || prop.prop_name.find("–") != string::npos || prop.prop_name.find('"') != string::npos || prop.prop_name == "0" || prop.monthly_rent < 100 || prop.room < 1){
             cout<<prop.toCSVFormat()<<endl;
         }

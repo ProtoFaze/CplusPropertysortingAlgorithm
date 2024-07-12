@@ -26,27 +26,26 @@ namespace clean{
         return str;
     }
 
-    void forwardFillEmpty(Vlist<Property> properties) {
-        string last_prop_name = replaceInvalidChar(properties[0].prop_name);
-        int last_room = properties[0].room;
-        double last_rent = properties[0].monthly_rent;
-        for (size_t i = 0; i < properties.getSize(); ++i) {
-            if (properties[i].ads_id == 0) {
-                properties[i].ads_id = properties[i - 1].ads_id;
-            }if (properties[i].prop_name !="0") {
-                last_prop_name = replaceInvalidChar(properties[i].prop_name);
+    void forwardFillEmpty(Vlist<Property> *properties) {
+        string last_prop_name = replaceInvalidChar((*properties)[0].prop_name);
+        int last_room = (*properties)[0].room;
+        double last_rent = (*properties)[0].monthly_rent;
+        for (size_t i = 0; i < properties->getSize(); ++i) {
+            if ((*properties)[i].ads_id == 0) {
+                (*properties)[i].ads_id = (*properties)[i - 1].ads_id;
+            }if ((*properties)[i].prop_name !="0") {
+                last_prop_name = replaceInvalidChar((*properties)[i].prop_name);
             }
-            properties[i].prop_name = last_prop_name;
-            if (properties[i].monthly_rent >= 100) {
-                last_rent = properties[i].monthly_rent;
+            (*properties)[i].prop_name = last_prop_name;
+            if ((*properties)[i].monthly_rent >= 100) {
+                last_rent = (*properties)[i].monthly_rent;
             }
-            properties[i].monthly_rent = last_rent;
-            if (properties[i].room < 1) {
-                properties[i].room = last_room;
+            (*properties)[i].monthly_rent = last_rent;
+            if ((*properties)[i].room < 1) {
+                (*properties)[i].room = last_room;
             }
-            last_room = properties[i].room;
+            last_room = (*properties)[i].room;
         }
-        // return properties;
     }
 
     // vector<Property> forwardFillEmpty(vector<Property> properties) {
