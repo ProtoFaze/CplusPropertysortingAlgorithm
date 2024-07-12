@@ -69,23 +69,40 @@ public:
 
 class PropertyContainer{
 
-public:    
-    Vlist<Property> properties;  // CustomVector to store properties
+private:
+    std::shared_ptr<Vlist<Property>> properties;  // Shared pointer to CustomVector
 
-    //TODO: fix the function to prevent property member destruction after function end
-    Vlist<Property>& getProperties() {
-        return properties;  
+public:
+    PropertyContainer() : properties(std::make_shared<Vlist<Property>>()) {}
+
+    // Return shared pointer to allow shared ownership
+    std::shared_ptr<Vlist<Property>> getProperties() {
+        return properties;
+    }
+
+    // Return const shared pointer to allow read-only shared ownership
+    std::shared_ptr<const Vlist<Property>> getProperties() const {
+        return properties;
+    }
+
+    // return a copy of the properties
+    Vlist<Property> getPropertiesCopy() const {
+        Vlist<Property> copy;
+        for (const auto& property : *properties) {
+            copy.emplaceBack(property);
+        }
+        return copy;
     }
     void setProperties(Vlist<Property> props) {
         cout<<"clearing properties"<<endl;
-        properties.clear();
-        if(properties.getSize() > 0){
+        properties->clear();
+        if(properties->getSize() > 0){
             cout<<"data still exist, aborting"<<endl;
             return;
         }else{
             cout<<"data has been cleared, setting properties"<<endl;
             for(size_t i ; i< props.getSize(); i++){
-                properties[i] = std::move(props[i]);
+                (*properties)[i] = std::move(props[i]);
             }
             cout<<"properties has been set"<<endl;
         }
@@ -93,13 +110,13 @@ public:
     
     // Insert new property
     void insertProperty(const Property& prop) {
-        properties.emplaceBack(prop);
+        properties->emplaceBack(prop);
     }
 
     void deleteProperty(int ads_id) {
-        for(size_t i = 0; i < properties.getSize(); ++i) {
-            if (properties[i].ads_id == ads_id) {
-                properties.erase(i);
+        for(size_t i = 0; i < properties->getSize(); ++i) {
+            if ((*properties)[i].ads_id == ads_id) {
+                properties->erase(i);
                 return;
             }
         }
@@ -107,7 +124,7 @@ public:
     }
 
     void editProperty(int ads_id, const Property& newProp) {
-        for (auto& property : properties) {
+        for (auto& property : *properties) {
             if (property.ads_id == ads_id) {
                 property = newProp;
                 return;
@@ -117,7 +134,7 @@ public:
     }
 
     void displayProperties() const {
-        for (const auto& property : properties) {
+        for (const auto& property : *properties) {
             property.display();
             cout << endl;
         }
@@ -178,7 +195,7 @@ public:
                 int rooms = stoi(tokens[6]);
 
                 // Property object and add to vector
-                properties.emplaceBack(ads_id, prop_name, monthly_rent, rooms);
+                properties->emplaceBack(ads_id, prop_name, monthly_rent, rooms);
          } else {
             cerr << "Skipping line due to Insufficient data" << endl;
         }
@@ -187,45 +204,45 @@ public:
         file.close();
     }
 
-    string replaceInvalidChar(string str){
-        if (str.find("–")!= string::npos){ 
-            //replace the character with a hyphen
-            int invalid_char_pos = str.find("–");
-            str.replace(invalid_char_pos, 3, "-");
-        }
-        if (str.find("@")!= string::npos){ 
-            //replace the character with @ symbol
-            int at_symbol_pos = str.find("@");
-            str.replace(at_symbol_pos, 1, "-");
-        }
-        if (str.find('"')!= string::npos){ 
-            //trim the quotation marks
-            str = str.substr(1, str.size()-2);
-        }
-        return str;
-    }
+    // string replaceInvalidChar(string str){
+    //     if (str.find("–")!= string::npos){ 
+    //         //replace the character with a hyphen
+    //         int invalid_char_pos = str.find("–");
+    //         str.replace(invalid_char_pos, 3, "-");
+    //     }
+    //     if (str.find("@")!= string::npos){ 
+    //         //replace the character with @ symbol
+    //         int at_symbol_pos = str.find("@");
+    //         str.replace(at_symbol_pos, 1, "-");
+    //     }
+    //     if (str.find('"')!= string::npos){ 
+    //         //trim the quotation marks
+    //         str = str.substr(1, str.size()-2);
+    //     }
+    //     return str;
+    // }
 
-    void forwardFillEmpty() {
-        string last_prop_name = replaceInvalidChar(properties[0].prop_name);
-        int last_room = properties[0].room;
-        double last_rent = properties[0].monthly_rent;
-        for (size_t i = 0; i < properties.getSize(); ++i) {
-            if (properties[i].ads_id == 0) {
-                properties[i].ads_id = properties[i - 1].ads_id;
-            }if (properties[i].prop_name !="0") {
-                last_prop_name = replaceInvalidChar(properties[i].prop_name);
-            }
-            properties[i].prop_name = last_prop_name;
-            if (properties[i].monthly_rent >= 100) {
-                last_rent = properties[i].monthly_rent;
-            }
-            properties[i].monthly_rent = last_rent;
-            if (properties[i].room < 1) {
-                properties[i].room = last_room;
-            }
-            last_room = properties[i].room;
-        }
-    }
+    // void forwardFillEmpty() {
+    //     string last_prop_name = replaceInvalidChar((*properties)[0].prop_name);
+    //     int last_room = (*properties)[0].room;
+    //     double last_rent = (*properties)[0].monthly_rent;
+    //     for (size_t i = 0; i < properties->getSize(); ++i) {
+    //         if ((*properties)[i].ads_id == 0) {
+    //             (*properties)[i].ads_id = (*properties)[i - 1].ads_id;
+    //         }if ((*properties)[i].prop_name !="0") {
+    //             last_prop_name = replaceInvalidChar((*properties)[i].prop_name);
+    //         }
+    //         (*properties)[i].prop_name = last_prop_name;
+    //         if ((*properties)[i].monthly_rent >= 100) {
+    //             last_rent = (*properties)[i].monthly_rent;
+    //         }
+    //         (*properties)[i].monthly_rent = last_rent;
+    //         if ((*properties)[i].room < 1) {
+    //             (*properties)[i].room = last_room;
+    //         }
+    //         last_room = (*properties)[i].room;
+    //     }
+    // }
 
     void writeToFile(const string& filePath){
         //open the file and write 
@@ -236,7 +253,7 @@ public:
         }else{
             cout<<"writing to file"<<endl;
         }
-        for(Property prop: properties){
+        for(Property prop: *properties){
             file<<prop.toCSVFormat()<<endl;
         }
         file.close();
