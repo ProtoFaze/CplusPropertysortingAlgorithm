@@ -22,21 +22,45 @@ int cleanData() {
 }
 
 int main(){
-    cleanData();
+    container.importClean(".././dataset/cleaned_prop_data.csv");
     Vlist<Property> prop = container.getPropertiesCopy();
-    cout << string(15, '-') << "Heap Sort" << string(15, '-') << endl;
-    int size = prop.getSize();
-    auto start = high_resolution_clock::now();
-    heapSort(prop, size, 1);
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<milliseconds>(stop - start);
-    cout << "Time taken by heap: " << duration.count() << "ms" << endl;
-
+    // cout << string(15, '-') << "Heap Sort" << string(15, '-') << endl;
+    // for (int i; i<10; i++){
+    //     int size = prop.getSize();
+    //     auto start = high_resolution_clock::now();
+    //     heapSort(prop, size, 1);
+    //     auto stop = high_resolution_clock::now();
+    //     auto duration = duration_cast<milliseconds>(stop - start);
+    //     cout << "Time taken by heap to sort name: "<< i << " " << duration.count() << "ms" << endl;
+    //     // printHeap(prop, size);
+    // }
+    // for (int i; i<10; i++){
+    //     int size = prop.getSize();
+    //     auto start = high_resolution_clock::now();
+    //     heapSort(prop, size, 2);
+    //     auto stop = high_resolution_clock::now();
+    //     auto duration = duration_cast<milliseconds>(stop - start);
+    //     cout << "Time taken by heap to sort monthly rent: "<< i << " " << duration.count() << "ms" << endl;
+    //     // printHeap(prop, size);
+    // }
+    // for (int i; i<10; i++){
+    //     int size = prop.getSize();
+    //     auto start = high_resolution_clock::now();
+    //     heapSort(prop, size, 3);
+    //     auto stop = high_resolution_clock::now();
+    //     auto duration = duration_cast<milliseconds>(stop - start);
+    //     cout << "Time taken by heap to sort room: "<< i << " " << duration.count() << "ms" << endl;
+    //     // printHeap(prop, size);
+    // }
     cout << string(15, '-') << "Tim Sort" << string(15, '-') << endl;
-
-    start = high_resolution_clock::now();
-    timSort(prop, size, 1);
-    stop = high_resolution_clock::now();
-    duration = duration_cast<milliseconds>(stop - start);
-    cout << "Time taken by tim: " << duration.count() << "ms" << endl;
+    for (int i; i<10; i++){
+        int size = prop.getSize();
+        auto start = high_resolution_clock::now();
+        timSort(container.getProperties(), size, 1);
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<milliseconds>(stop - start);
+        cout << "Time taken by tim to sort room: "<< i << " " << duration.count() << "ms" << endl;
+        // printTim(prop, size);
+    }
+    return 0;
 }

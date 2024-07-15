@@ -86,5 +86,5 @@ void heapSort(Vlist<Property>& arr, int N, int Type)
         heapify(arr, i, 0, Type);
     }
 
-    printHeap(arr, N);
+    // printHeap(arr, N);
 }

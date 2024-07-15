@@ -149,10 +149,8 @@ public:
             cerr << "Error opening file: " << filename << endl;
             return;
         }
-
         string line; // Holds each line from the file
         getline(file, line); 
-
         while (getline(file, line)) {
             stringstream ss(line);
             string token;
@@ -210,19 +208,14 @@ public:
             cerr << "Error opening file: " << filename << endl;
             return;
         }
-
         string line; // Holds each line from the file
-        getline(file, line); 
-
         while (getline(file, line)) {
             stringstream ss(line);
             string token;
             Vlist<string> tokens;
-            //Check for String token with using quotations
             while (getline(ss, token, ',')){
                 tokens.pushBack(token);
             }
-            // Property object and add to vector
             properties->emplaceBack(stoi(tokens[0]), tokens[1], stoi(tokens[2]), stoi(tokens[3]));
         }
         cerr << "File Imported" << endl;
