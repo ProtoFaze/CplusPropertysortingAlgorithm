@@ -8,6 +8,7 @@ using namespace std;
 
 namespace clean{
     string replaceInvalidChar(string str){
+        cout << "Replace Invalid Char" << endl;
         if (str.find("–")!= string::npos){ 
             //replace the character with a hyphen
             int invalid_char_pos = str.find("–");
@@ -22,10 +23,11 @@ namespace clean{
             //trim the quotation marks
             str = str.substr(1, str.size()-2);
         }
-        return str;
+        return str; 
     }
 
     void forwardFillEmpty(Vlist<Property> *properties) {
+        cout << "Forward Fill" << endl;
         string last_prop_name = replaceInvalidChar((*properties)[0].prop_name);
         int last_room = (*properties)[0].room;
         double last_rent = (*properties)[0].monthly_rent;

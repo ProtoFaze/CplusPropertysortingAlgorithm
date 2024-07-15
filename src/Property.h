@@ -99,6 +99,7 @@ public:
         }
         return copy;
     }
+
     void setProperties(Vlist<Property> props) {
         cout<<"clearing properties"<<endl;
         properties->clear();
@@ -156,7 +157,7 @@ public:
         while (getline(file, line)) {
             stringstream ss(line);
             string token;
-
+            cout << "Getting Line" << endl;
             Vlist<string> tokens;
             //Check for String token with using quotations
             while (getline(ss, token, ',')) {
@@ -202,7 +203,7 @@ public:
             cerr << "Skipping line due to Insufficient data" << endl;
         }
     }
-
+        cout << "File Imported" << endl;
         file.close();
     }
 
