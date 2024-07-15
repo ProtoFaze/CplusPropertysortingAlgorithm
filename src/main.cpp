@@ -5,6 +5,7 @@
 #include "heapsort.h"
 
 using namespace std;
+using namespace std::chrono;
 
 int Property::objectCount = 0;  // Definition of the static member
 PropertyContainer container; // create container
@@ -23,5 +24,9 @@ int main(){
     cleanData();
     Vlist<Property> prop = container.getPropertiesCopy();
     int size = prop.getSize();
+    auto start = high_resolution_clock::now();
     heapSort(prop, size, 2);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<seconds>(stop - start);
+    cout << "Time taken by heap: " << duration.count() << " seconds" << endl;
 }
