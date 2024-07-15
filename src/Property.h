@@ -220,13 +220,5 @@ public:
         }
         file.close();
     }
-    
-    // void sorting_algo1(){
-    //     tim_sort(*properties);
-    // }
-
-    // void sorting_algo2(){
-    //     heapSort(*properties);
-    // }
 };
 #endif
