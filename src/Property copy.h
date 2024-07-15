@@ -50,6 +50,7 @@ public:
     vector<Property> getProperties() const {
         return properties;
     }
+
     void setProperties(vector<Property> props) {
         properties.clear();
         if(properties.size()>0){
@@ -63,6 +64,7 @@ public:
         }
 
     }
+    
     // Insert new property
     void insertProperty(const Property& prop) {
         properties.push_back(prop);

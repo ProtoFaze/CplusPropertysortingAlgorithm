@@ -1,11 +1,18 @@
 #include <iostream>
+#include <typeinfo>
+#include <chrono>
 // #include "CustomVector.h"
 // #include "Property.h"
 #include "dataCleaning.h"
+#include "Heap.h"
+
 
 using namespace std;
+using namespace std::chrono;
 
 int Property::objectCount = 0;  // Definition of the static member
+PropertyContainer container;
+
 struct coords{
     float x = 0.0f, y = 0.0f, z = 0.0f;
 
@@ -53,9 +60,8 @@ struct coords{
 //     cout << endl;
 // }
 
-int main(){
-    cout << "--program started--"<<endl;
-    PropertyContainer container;
+int cleanData() {
+    cout << "--Cleaning Started--"<<endl;
     container.importFile(".././dataset/mudah-apartment-kl-selangor.csv");
     
     container.setProperties(clean::forwardFillEmpty(container.getProperties()));
@@ -67,6 +73,25 @@ int main(){
     cout<<"all supposedly invalid elements printed"<<endl;
     container.writeToFile(".././dataset/cleaned_prop_data.csv");
     cout << Property::objectCount << " property remaining before scope end" << endl;
-    cout << " program ended" << endl;
+    cout << "Cleaning Done" << endl;
     return 0;
+}
+
+int main(){
+    cleanData();
+    cout << "Heap Sort" << endl;
+    int size = 0;
+    std::vector<Property> props = container.getProperties();
+    for(Property prop : props) {
+        cout << prop.toCSVFormat() << endl;
+        size++;
+    }
+    cout << "Size: " << size << endl;
+    auto start = high_resolution_clock::now();
+    int arr[] = { 12, 11, 13, 5, 6, 7 };
+    int N = sizeof(arr) / sizeof(arr[0]);
+    heapSort(arr, N);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<seconds>(stop - start);
+    cout << "Time taken by function: " << duration.count() << " seconds" << endl;
 }

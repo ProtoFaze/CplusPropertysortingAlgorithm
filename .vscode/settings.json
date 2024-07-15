@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.embeddedhtml": "html",
+        "iostream": "cpp",
+        "*.tcc": "cpp",
+        "string": "cpp",
+        "ostream": "cpp",
+        "chrono": "cpp"
+    }
+}
