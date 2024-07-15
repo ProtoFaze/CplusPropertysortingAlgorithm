@@ -4,8 +4,9 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <memory>
 #include "Vlist.h"
-#include "SortingAlgo1.h"
+#include "heapsort.h"
 #include "SortingAlgo2.h"
 
 using namespace std;
@@ -47,6 +48,12 @@ public:
         room = newProp.room;
         return *this;
     }
+    
+    bool operator>(const Property& other) const {
+        // Compare based on monthly rent
+        return this->monthly_rent > other.monthly_rent;
+    }
+    
     // Display property details
     void display() const {
         cout << "-------------------------" << endl;

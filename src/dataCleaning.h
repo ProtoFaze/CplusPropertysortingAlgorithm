@@ -1,5 +1,4 @@
 #include "Property.h"
-// #include "Property copy.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
