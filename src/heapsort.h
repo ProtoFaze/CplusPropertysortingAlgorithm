@@ -63,7 +63,7 @@ void printArray(Vlist<Property>& arr, int N)
 {
     cout << "Sorted Array: " << endl;
     for (int i = 0; i < N; ++i) {
-        arr[i].display();
+        cout << arr[i].toCSVFormat() << endl;
     }
 }
 

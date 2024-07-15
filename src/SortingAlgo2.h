@@ -1,4 +1,4 @@
-#include <bits/stdc++.h> 
+// #include <bits/stdc++.h> 
 #include "Property.h"
 using namespace std; 
 const int RUN = 32; 
