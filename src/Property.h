@@ -1,10 +1,12 @@
 #ifndef PROPERTY_H
 #define PROPERTY_H
 #include <iostream>
-#include "CustomVector.h"
 #include <fstream>
 #include <sstream>
 #include <string>
+#include "Vlist.h"
+#include "SortingAlgo1.h"
+#include "SortingAlgo2.h"
 
 using namespace std;
 
@@ -28,7 +30,7 @@ public:
             objectCount++;
     }
     Property(const Property& new_prop) : ads_id(new_prop.ads_id), prop_name(new_prop.prop_name), monthly_rent(new_prop.monthly_rent), room(new_prop.room){
-        cout<<"copy constructor called"<<endl;
+        objectCount++;
     }
 
     Property& operator=(const Property& newProp){
@@ -36,7 +38,6 @@ public:
         prop_name = newProp.prop_name;
         monthly_rent = newProp.monthly_rent;
         room = newProp.room;
-        cout<<"copy assignment operator called"<<endl;
         return *this;
     }
     Property& operator=(Property&& newProp){
@@ -44,7 +45,6 @@ public:
         prop_name = newProp.prop_name;
         monthly_rent = newProp.monthly_rent;
         room = newProp.room;
-        cout<<"move assignment operator called"<<endl;
         return *this;
     }
     // Display property details
@@ -108,10 +108,6 @@ public:
         }
     }
     
-    // Insert new property
-    void insertProperty(const Property& prop) {
-        properties->emplaceBack(prop);
-    }
 
     void deleteProperty(int ads_id) {
         for(size_t i = 0; i < properties->getSize(); ++i) {
@@ -174,7 +170,7 @@ public:
                     tokens.pushBack(token);
                 }
             }
-            if (tokens.getSize() >= 11) { // Check if the line has enough tokens
+            if (tokens.getSize() >= 4) { // Check if the line has enough tokens
                 int ads_id = stoi(tokens[0]);
                 string prop_name = tokens[1];
                 double monthly_rent;
@@ -204,46 +200,6 @@ public:
         file.close();
     }
 
-    // string replaceInvalidChar(string str){
-    //     if (str.find("–")!= string::npos){ 
-    //         //replace the character with a hyphen
-    //         int invalid_char_pos = str.find("–");
-    //         str.replace(invalid_char_pos, 3, "-");
-    //     }
-    //     if (str.find("@")!= string::npos){ 
-    //         //replace the character with @ symbol
-    //         int at_symbol_pos = str.find("@");
-    //         str.replace(at_symbol_pos, 1, "-");
-    //     }
-    //     if (str.find('"')!= string::npos){ 
-    //         //trim the quotation marks
-    //         str = str.substr(1, str.size()-2);
-    //     }
-    //     return str;
-    // }
-
-    // void forwardFillEmpty() {
-    //     string last_prop_name = replaceInvalidChar((*properties)[0].prop_name);
-    //     int last_room = (*properties)[0].room;
-    //     double last_rent = (*properties)[0].monthly_rent;
-    //     for (size_t i = 0; i < properties->getSize(); ++i) {
-    //         if ((*properties)[i].ads_id == 0) {
-    //             (*properties)[i].ads_id = (*properties)[i - 1].ads_id;
-    //         }if ((*properties)[i].prop_name !="0") {
-    //             last_prop_name = replaceInvalidChar((*properties)[i].prop_name);
-    //         }
-    //         (*properties)[i].prop_name = last_prop_name;
-    //         if ((*properties)[i].monthly_rent >= 100) {
-    //             last_rent = (*properties)[i].monthly_rent;
-    //         }
-    //         (*properties)[i].monthly_rent = last_rent;
-    //         if ((*properties)[i].room < 1) {
-    //             (*properties)[i].room = last_room;
-    //         }
-    //         last_room = (*properties)[i].room;
-    //     }
-    // }
-
     void writeToFile(const string& filePath){
         //open the file and write 
         ofstream file(filePath); // Open file
@@ -259,5 +215,12 @@ public:
         file.close();
     }
     
+    // void sorting_algo1(){
+    //     tim_sort(*properties);
+    // }
+
+    // void sorting_algo2(){
+    //     heapSort(*properties);
+    // }
 };
 #endif

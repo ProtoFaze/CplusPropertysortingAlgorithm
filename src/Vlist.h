@@ -40,7 +40,6 @@ class Vlist {
         ~Vlist() {
             clear();
             ::operator delete(data, capacity * sizeof(T));
-            std::cout << "Vlist object destroyed" << std::endl;
         }
 
         void pushBack(const T& value) {
@@ -106,7 +105,7 @@ class Vlist {
             return capacity;
         }
 
-        bool is_empty() const {
+        bool isEmpty() const {
             return size == 0;
         }
 
