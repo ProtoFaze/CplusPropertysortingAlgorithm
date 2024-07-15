@@ -9,6 +9,9 @@ using namespace std;
 namespace clean{
     string replaceInvalidChar(string str){
         cout << "Replace Invalid Char" << endl;
+
+
+        
         if (str.find("–")!= string::npos){ 
             //replace the character with a hyphen
             int invalid_char_pos = str.find("–");
