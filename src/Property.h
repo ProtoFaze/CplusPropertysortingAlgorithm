@@ -157,7 +157,6 @@ public:
         while (getline(file, line)) {
             stringstream ss(line);
             string token;
-            cout << "Getting Line" << endl;
             Vlist<string> tokens;
             //Check for String token with using quotations
             while (getline(ss, token, ',')) {
