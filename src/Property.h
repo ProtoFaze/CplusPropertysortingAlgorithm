@@ -6,7 +6,6 @@
 #include <string>
 #include <memory>
 #include "Vlist.h"
-#include "heapsort.h"
 #include "SortingAlgo2.h"
 
 using namespace std;
