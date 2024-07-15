@@ -6,7 +6,6 @@
 #include <string>
 #include <memory>
 #include "Vlist.h"
-#include "SortingAlgo2.h"
 
 using namespace std;
 
@@ -144,7 +143,7 @@ public:
     }
 
     // Import from file
-    void importFile(const string& filename) {
+    void importRaw(const string& filename) {
         ifstream file(filename); // Open file
         if (!file.is_open()) { // Check if the file opening is successful
             cerr << "Error opening file: " << filename << endl;
@@ -195,14 +194,38 @@ public:
                     tokens[6] = "11";
                 }
                 int rooms = stoi(tokens[6]);
-
                 // Property object and add to vector
                 properties->emplaceBack(ads_id, prop_name, monthly_rent, rooms);
-         } else {
-            cerr << "Skipping line due to Insufficient data" << endl;
+            } else {
+                cerr << "Skipping line due to Insufficient data" << endl;
+            }
         }
-    }
         cout << "File Imported" << endl;
+        file.close();
+    }
+
+    void importClean(const string& filename) {
+        ifstream file(filename); // Open file
+        if (!file.is_open()) { // Check if the file opening is successful
+            cerr << "Error opening file: " << filename << endl;
+            return;
+        }
+
+        string line; // Holds each line from the file
+        getline(file, line); 
+
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string token;
+            Vlist<string> tokens;
+            //Check for String token with using quotations
+            while (getline(ss, token, ',')){
+                tokens.pushBack(token);
+            }
+            // Property object and add to vector
+            properties->emplaceBack(stoi(tokens[0]), tokens[1], stoi(tokens[2]), stoi(tokens[3]));
+        }
+        cerr << "File Imported" << endl;
         file.close();
     }
 

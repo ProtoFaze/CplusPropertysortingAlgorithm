@@ -59,7 +59,7 @@ void heapify(Vlist<Property>& arr, int N, int i, int Type) {
 }
 
 // A utility function to print array of size n
-void printArray(Vlist<Property>& arr, int N)
+void printHeap(Vlist<Property>& arr, int N)
 {
     cout << "Sorted Array: " << endl;
     for (int i = 0; i < N; ++i) {
@@ -86,5 +86,5 @@ void heapSort(Vlist<Property>& arr, int N, int Type)
         heapify(arr, i, 0, Type);
     }
 
-    printArray(arr, N);
+    printHeap(arr, N);
 }
