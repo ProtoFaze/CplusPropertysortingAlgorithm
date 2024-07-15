@@ -28,5 +28,5 @@ int main(){
     heapSort(prop, size, 2);
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<seconds>(stop - start);
-    cout << "Time taken by function: " << duration.count() << " seconds" << endl;
+    cout << "Time taken by heap: " << duration.count() << " seconds" << endl;
 }
