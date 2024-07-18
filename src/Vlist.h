@@ -39,7 +39,6 @@ class Vlist {
 
         ~Vlist() {
             clear();
-            ::operator delete(data, capacity * sizeof(T));
         }
 
         void pushBack(const T& value) {
